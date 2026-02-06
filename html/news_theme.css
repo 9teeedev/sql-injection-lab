@@ -1,0 +1,234 @@
+/* News Site Specific Styles - Appended to style.css */
+
+/* News Layout */
+.news-body {
+  background-color: #f3f4f6;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.news-navbar {
+  background-color: var(--news-header-bg);
+  color: var(--news-header-text);
+  padding: 1rem 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.news-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.news-brand {
+  font-family: var(--news-font);
+  font-size: 1.6rem; /* Slightly smaller to save space */
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0; /* Prevent logo from shrinking */
+}
+
+.news-brand span {
+  color: var(--news-accent);
+}
+
+.news-nav-links a {
+  color: #cbd5e1;
+  text-decoration: none;
+  margin-left: 1rem; /* Reduced from 1.5rem */
+  font-size: 0.85rem; /* Slight reduction for better fit */
+  font-weight: 500;
+  transition: color 0.2s;
+  white-space: nowrap; /* Prevent line breaks within links */
+}
+
+.news-nav-links a:hover {
+  color: white;
+}
+
+.news-nav-links a.active {
+  color: white;
+  border-bottom: 2px solid var(--news-accent);
+}
+
+/* Article Hero */
+.article-hero {
+  background: white;
+  padding: 3rem 0 2rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+
+.article-header {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+
+.article-category {
+  color: var(--news-accent);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.article-title {
+  font-family: var(--news-font);
+  font-size: 2.5rem;
+  line-height: 1.2;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.article-meta {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+/* Main Content Layout */
+.news-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 3rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 1.5rem 4rem;
+}
+
+.article-content {
+  font-family: "Georgia", serif;
+  font-size: 1.25rem; /* Larger, readable font */
+  line-height: 1.8;
+  color: #374151;
+}
+
+.article-content p {
+  margin-bottom: 1.5rem;
+}
+
+.article-content h3 {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+/* Sidebar Widgets */
+.news-widget {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.widget-title {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--news-accent);
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.related-post {
+  display: block;
+  text-decoration: none;
+  color: #111827;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  transition: color 0.2s;
+}
+
+.related-post:hover {
+  color: var(--news-accent);
+}
+
+.related-post h4 {
+  font-size: 1rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.related-post span {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Debug Console */
+.debug-console {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #1e293b;
+  border-top: 4px solid var(--warning-color);
+  color: #e2e8f0;
+  font-family: "Consolas", monospace;
+  z-index: 1000;
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.debug-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: #0f172a;
+  cursor: pointer;
+}
+
+.debug-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--warning-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.debug-content {
+  padding: 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.debug-label {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.debug-code {
+  color: #38bdf8;
+  background: #0f172a;
+  padding: 0.5rem;
+  border-radius: 4px;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.console-minimized .debug-content {
+  display: none;
+}

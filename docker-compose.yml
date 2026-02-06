@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  web:
+    build: .
+    container_name: sqli_web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./html:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - sqli_internal
+    restart: unless-stopped
+
+  db:
+    image: mysql:5.7
+    container_name: sqli_db
+    # Disable secure-file-priv to allow LOAD_FILE() for Lab 9
+    command: --secure-file-priv=""
+    # NO ports exposed - Internal network only for VPS security
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: sqli_lab
+      MYSQL_USER: sqli_user
+      MYSQL_PASSWORD: sqli_password
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+    networks:
+      - sqli_internal
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-prootpassword",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  sqli_internal:
+    driver: bridge
+    internal: true  # Isolated from external network for security
+
+volumes:
+  mysql_data:
