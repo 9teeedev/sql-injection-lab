@@ -58,7 +58,7 @@
             </a>
 
             <a href="lab_file.php" class="lab-card">
-                <span class="lab-number">Lab 9</span>
+                <span class="lab-number">Lab 7</span>
                 <h3>File Read/Write via SQLi</h3>
                 <p>Use LOAD_FILE() and INTO OUTFILE to access the server file system.</p>
             </a>
