@@ -77,17 +77,30 @@
             }
             ?>
 
-            <form method="POST">
+            <form method="POST" onsubmit="return validateForm()">
                 <div class="form-group">
                     <label for="username">Username / Email</label>
-                    <input type="text" id="username" name="username" placeholder="Enter username">
+                    <input type="text" id="username" name="username" placeholder="Enter username" required>
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter password">
+                    <input type="password" id="password" name="password" placeholder="Enter password" required>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.8rem; font-size: 1rem; margin-top: 1rem;">Sign In</button>
             </form>
+
+            <script>
+            function validateForm() {
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value.trim();
+
+                if (!username || !password) {
+                    alert('Please enter both username and password');
+                    return false;
+                }
+                return true;
+            }
+            </script>
             
             <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;">
                 <a href="#" style="color: var(--news-accent); text-decoration: none;">Forgot password?</a>
